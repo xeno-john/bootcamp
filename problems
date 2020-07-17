@@ -1,0 +1,84 @@
+t Operations. Bit mask] Create a function called printBits(uint32) that prints all contained bits of received param.
+DONE
+
+2. [Buffers. Boundaries. Pointer operations. Casts] Create a function named uint32 getValue(char *buffer, int offset, int bufferSize) that receives a buffer , offset in buffer to read from and size in bytes.
+The function must read un uint32 value from buffer starting from offset and return it
+
+3. [Callbacks , function pointers] Create a function called handleData( progressCallback , char* data , dataSize  ). The function must print each decimal value of each byte contained in pData.
+progressCallback must receive index and dataSize and print the percentage of the operation completion. Main function must call handleData by passing an implemented callback , an initialized buffer and buffer size
+
+4. [Macros] Create a printf based macro named DBG_PRINT(debugLevel , format , ... ) where debugLevel is an integer value (from 1-5) , and ... is a variable argument list
+The printed ouput of the called macro must be of the following format
+[debugLevel][__FILE__][__LINE__] Formatted text
+Example of macro call: DBG_PRINT(5, "My value is %d", 5);
+Use this macro in the next implementations
+
+5. [Serialize/Deserialize] Implement an application that serializes a given data structure into a buffer and vice versa. The functions are
+- int serializeData(COMPONENT_DATA* componentInfo, void* buffer, size_t bufferSize, size_t *result)
+This function serializes the content of the componentInfo and fills the passed buffer with it
+componentInfo - IN - has all the members initialized and filled with valid data
+buffer - IN/OUT - is allocated by the caller before calling this function and will contain the serialized data if big enough
+bufferSize - IN - size in bytes of the already allocated buffer passed to this function
+result - IN/OUT - 0 success , non-zero error
+return value - OUT - size in bytes of the serialized data that must be filled in buffer
+
+- int deserializeData(void *buffer, size_t bufferSize, COMPONENT_DATA* componentInfo, size_t *result)
+This function deserializes the content of the buffer and fills componentInfo with it
+buffer - IN - a buffer that is already allocated and contains the serialized data
+bufferSize - IN - size in bytes of buffer
+componentInfo - IN/OUT - a valid pointer to a componentInfo that will be initialized with the data contained in the buffer
+result - IN/OUT - 0 success , non-zero error
+return value - OUT - size in bytes of the serialized data that must be filled in buffer
+
+typedef struct _COMPONENT_DATA
+{
+	int attributes;
+	char *name;
+	size_t nameSize;
+}COMPONENT_DATA, *PCOMPONENT_DATA;
+
+6. [list/queue] Implement from zero the concept of queue of integers in C
+Critical functions that need implementation
+push
+pop
+
+7. [Linux dynamic libraries] Create an library called sample.so that exports 2 functions. int* allocInLib() and void freeInLib( int* ).
+These functions allocate/deallocate an integer using malloc/free and print the operation.
+Create 2 projects. First project links the .so at build time , second project loads and calls the functions in the .so using dlopen,dlsym,dlclose api.
+In both cases main function declares an int* loads the library if necessary , calls allocInLib to obtain int* , sets the value , prints it , and calls freeInLib
+
+8. [Threads , callbacks variable passing] Implement using pthreads an application that starts 10 worker threads , passes an incremented index as value to each thread callback , lists the parameter from each thread , and waits for them
+
+9. [Mutex , Critical Section] Starting from previous example, we consider that we define a variable in main, initialize it to 0, pass it to all threads, and increment the value in thread callbacks.
+Observe the output. Guard the value by mutex/critical section both in main and in thread the callbacks.
+Usage of global variables is forbidden.
+
+10. [Thread Synchronization] Implement using pthread an application that starts 10 worker threads. Thread function must iterate through a loop simulating processing till main function signals it to stop processing.
+When signal is received , thread function must complete and return normally.
+Main function starts the threads , sleeps for 5 seconds , signals the threads to finish processing , and waits for all
+
+11. [Many producers one consumer , modular programming] Implement the many producers one consumer using an synchronized queue of integers and pthread library functions. A synchronized queue guards all it's operations ( push , pop ) with a mutex.
+The api must contain the following functions:
+void * initializeEngine() - allocates an internal ENGINE_DATA * struct
+int    startEngine(void *engine) - starts the consumer thread that consumes the queue
+int    produce(void *engine, int index) - a function that receives an integer , prints it's thread id and index value and calls push into the synchronized queue , engine must be previously created with initializeEngine
+int    onConsume(void *engine, int index) - a function that is called by a consumer thread and extracts elements and prints them
+void   stopEngine(void *engine) - signals and waits the consumer thread to finish ,
+void   destroyEngine(void *engine) - deallocates ENGINE_DATA * members created with initializeEngine and struct
+
+main function must call initializeEngine , startEngine , creates 10 threads on which calls produce with distinct values , waits for the produce threads to finish , calls stopEngine and destroyEngine
+
+12. Write a program that prints the distinct words in its input, sorted into decreasing order of occurrence. Precede each word by its count.
+The input is a text file.
+	(sol1 with linked list, sol2: BST)
+
+13. Implementarea unui editor de text din linie de comanda
+- aplicatia ta afiseaza la consola un meniu cu urmatoarele optiuni : open file, save file, print file content, write text at position, delete text from position, undo, redo
+open file - introducerea de la tst file name; file save - salveaza continutul curent al fisierului in acleasi fisier pe disc
+write text at position - introduci textul ce trebuie inserat si pozitia la care se insereaza
+delete text from position - pozitia de la care se sterge si nr de caractere care trebuie sterse
+undo - sa anuleze efectul ultimei operatie de insertie sau stergere text
+redo - sa anuleze efectul ultimului undo
+
+14. implement message queue functionality
+
