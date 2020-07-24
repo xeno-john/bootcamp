@@ -3,6 +3,8 @@
 #include<stdint.h>
 #include<string.h>
 
+/* dummy comment please remove . Take into account the findings from problem no. 1 */
+
 uint32_t getValue(char* buffer, int offset, int bufferSize);
 
 uint32_t getValue(char* buffer, int offset, int bufferSize)
