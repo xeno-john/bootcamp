@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdint.h> // this is the library where uint32_t is found.
 
+/* @TODO: please delete this dummy comment (ma bat finding-urile pe github)*/
 void printBits(uint32_t x); // declaration
 
 // implementation.
