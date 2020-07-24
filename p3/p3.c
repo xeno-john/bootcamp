@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 
+/* dummy comment(please remove it when submitting the changes) */
 void progressCallback(int index, int dataSize);
 void handleData( void (*pCallback)(int, int), char* data, int dataSize );
 
