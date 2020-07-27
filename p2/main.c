@@ -2,14 +2,29 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<string.h>
+#include <errno.h>
+
+/* remains to solve the \n problem sommehow.
+ * \n is automatically inserted in the string while reading it
+ * because of how fgets work
+ */
 
 uint32_t getValue(char* buffer, int offset, int bufferSize);
 
+
+/*!
+ *  \fn uint32_t getValue(char* buffer, int offset, int bufferSize)
+ *  \brief The function that handles the given task.
+ *  \param buffer The variable from which we are to read and produce the asked output.
+ *  \param offset A number that indicates the position from which to start doing the task.
+ *  \param bufferSize The actual size of the buffer variable. Useful in comparing it to the offset.
+ */
 uint32_t getValue(char* buffer, int offset, int bufferSize)
 {
-    int i=0;
-    uint32_t result=0;
-    if(offset<bufferSize) // if offset is bigger it makes no sense to continue
+    int i=0; 
+    uint32_t result=0; /*!< This value will be returned as the wished output. */
+    int flag = 0; /*!< Used to see if we actually read any numbers to signal the program to stop if we reach a char after that. */
+    if(offset<bufferSize) /* if offset is bigger it makes no sense to continue */
     {
         /*
          * we start from the offset index
@@ -29,12 +44,32 @@ uint32_t getValue(char* buffer, int offset, int bufferSize)
             }
             else
             {
-                result=result*10+(buffer[i]-'0');
-                /* we multiply by 10 to add another decimal to the number
+                /* this 'if' tests whether the character we reached in the buffer traversal
+                 * is a digit, using the ascii values for 0-9 digits
+                 * we multiply by 10 to add another decimal to the number
                  * which works fine with 0 ( initial value ) too
                  * then we sum the result with the decimal we are currently at. 
                  * the conversion from char to int is done using -'0'
                  */
+                if(buffer[i]>=48 && buffer[i]<=57)
+                {
+                    flag = 1;
+                    result=result*10+(buffer[i]-'0');
+                }
+                /* if it is NOT a digit */
+                else
+                {
+                    /* but we have parsed digits in the past */
+                    if(flag == 1)
+                    {
+                        /* that means our job is actually over 
+                         * -> we created in the 'result' variable a number which
+                         * is in our buffer
+                         * after the given offset.
+                         */
+                        break;
+                    }
+                }
             }
         }
     }
