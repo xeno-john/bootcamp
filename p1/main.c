@@ -1,100 +1,84 @@
-#include<stdio.h>
-#include<stdint.h> /* this is the library where uint32_t is found. */
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdint.h> 
+#include <stdlib.h>
 #include <errno.h>
 
-void printBits(uint32_t x);
-
-/*!
- *  \fn void printBits(uint32_t givenValue)
- *  \brief The function that handles the given task (printing the bits of a given number.)
- *  \param givenValue Value that we will print the bits of.
+/**
+ * @brief Function that receives an uint32_t and prints the bit configuration of that number.
+ * @param [in] input_value - the value gave by the user for which we will print the bits 
  */
-void printBits(uint32_t givenValue)
+void printBits(uint32_t input_value);
+
+void printBits(uint32_t input_value)
 {
 	int i = 0;
-        /* the number of bits that the number has is 8 ( because there are 8 bits in a byte )
-         * times the size in bytes of the data type. So, in order to make sure that all of the
-         * potential bits of the number are traversed, we use a contor value that goes from sizeof(x)*8-1
-         * to 0.
-         */
+        int nr_of_bits = sizeof(input_value)*8-1;
+
         printf("\nThis is the number you gave written in binary representation:\n");
-	for(i=sizeof(givenValue)*8-1;i>=0;--i)
+
+	for(i=nr_of_bits;i>=0;--i)
 	{
-	        printf("%u", ( (1 << i) & givenValue ) ? 1 : 0 );
-                /* this method does bitwsie and between the given number
-                 * and '1' shifted left by 'i' positions
-                 * in this way, we traverse the number from right to left
-                 * resulting in a correct output.
-                 */
+	        printf("%u", ( (1 << i) & input_value ) ? 1 : 0 );
                 if( i%4 == 0 )
                 {
                         printf("\t");
                 }
 	}
+
         printf("\n");
 }
 
 int main(void)
 {
-        /* remains to implement the part in which i validate the input the user gave
-         * -> alternatives to scanf (errno, limits, etc haven't worked)
-         */
-	uint32_t givenValue = 0; /*!< The number that we'll be printing the bits of. */
-        char buf[1024]; /*!< Buffer used to read the number with the help of fgets and strtol. */
-        char *endptr; /*! endptr is set to point at the first character that couldn't
-        be converted. So we have a way to check whether the whole string was converted. */
+	uint32_t           input_value = 0; 
+        char      input_buffer[1024] = {0}; 
+        char                *endptr = NULL;
+        int         was_read_correctly = 1; 
+
 	printf("Give the value for which to print the bits: ");
-        /* http://sekrit.de/webdocs/c/beginners-guide-away-from-scanf.html
-         * used guide from here.
-         * fgets seems to be as efficient as scanf previously was but with 
-         * more lines of code.
-         * Signaled errors:
-         * - if user tries to input characters
-         * - if number is numerically out of range ( assume max 64 bit number )
-         * It does not signal:
-         * - negative number input (fixed with an if unrelated to fgets)
+
+        /* 
+         * Presuming wrong input from user, it does not signal:
          * - number that exceeds the range of uint_32 (remains to be fixed)
          * For example: 4294967295 is the max value of uint_32 ( and this can be also confirmed by the output )
-         * which shows 1111 [..] 1111
-         * But when the users enters 4294967296, the numbers is represented as
-         * 0000 [..] 0000 (some sort of reset.)
+         * If bigger numbers are entered the actual value seems to reset ( go back to 0 and upwards.)
          */
-        if (!fgets(buf, 1024, stdin)) /* fgets returns NULL if the input was not read correctly. */
+
+        if (!fgets(input_buffer, 1024, stdin)) /* fgets returns NULL if the input was not read correctly. */
         {
-            /* reading input failed: */
-            fprintf(stderr,"Reading input failed.\n");
-            exit(EXIT_FAILURE);
+                fprintf(stderr,"Reading input failed.\n");
+                was_read_correctly = 0;
         }
-        /* have fixed negative number input with this 
-         * condition
-         */
-        if( buf[0] == '-' )
+
+        if ('-' == input_buffer[0] && 1 == was_read_correctly)
         {
                 fprintf(stderr,"Negative number not allowed.\n");
-                exit(EXIT_FAILURE);
+                was_read_correctly = 0;
         }
+
         errno = 0; /* reset error number */
-        givenValue = strtol(buf, &endptr, 10);
-        if (errno == ERANGE) /* numerical out of range. NOT out of range of the respective data type. */
+        input_value = strtol(input_buffer, &endptr, 10);
+
+        if (ERANGE == errno && 1 == was_read_correctly) 
         {
-            fprintf(stderr,"Sorry, this number is too small or too large.\n");
-            exit(EXIT_FAILURE);
+                fprintf(stderr,"Sorry, this number is too small or too large.\n");
+                was_read_correctly = 0;
         }
-        else if (endptr == buf)
+        else if (endptr == input_buffer && 1 == was_read_correctly)
         {
-            /* incorrect input */
-            fprintf(stderr,"Incorrect input.\n(Entered characters or characters and digits.)\n");
-            exit(EXIT_FAILURE);
+                fprintf(stderr,"Incorrect input.\n(Entered characters or characters and digits.)\n");
+                was_read_correctly = 0;
         }
-        else if (*endptr && *endptr != '\n')
+        else if (*endptr && '\n' != *endptr && 1 == was_read_correctly)
         {
-            /* *endptr is neither end of string nor newline,
-             * so we didn't convert the *whole* input
-             */
-            fprintf(stderr,"Input didn't get wholely converted.\n(Entered digits and characters)\n");
-            exit(EXIT_FAILURE);
+                fprintf(stderr,"Input didn't get wholely converted.\n(Entered digits and characters)\n");
+                was_read_correctly = 0;
         }
-	printBits(givenValue);
+
+        if (1 == was_read_correctly)
+        {
+	        printBits(input_value);
+        }
+
 	return 0;
 }
