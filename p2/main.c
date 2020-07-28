@@ -2,121 +2,146 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include<string.h>
-#include <errno.h>
 
-/* remains to solve the \n problem sommehow.
- * \n is automatically inserted in the string while reading it
- * because of how fgets work
+
+/**
+ * @brief The function that handles the given task.
+ * @param [in] input_buffer - the value gave by the user for which we will print the bits
+ * @param [in] offset - index from where the function will parse
+ * @param [in] bufferSize - max dimension of input_buffer 
  */
-
-uint32_t getValue(char* buffer, int offset, int bufferSize);
+uint32_t getValue(char* input_buffer, int offset, int bufferSize);
 
 
 /*!
- *  \fn uint32_t getValue(char* buffer, int offset, int bufferSize)
+ *  \fn uint32_t getValue(char* input_buffer, int offset, int bufferSize)
  *  \brief The function that handles the given task.
- *  \param buffer The variable from which we are to read and produce the asked output.
+ *  \param input_buffer The variable from which we are to read and produce the asked output.
  *  \param offset A number that indicates the position from which to start doing the task.
  *  \param bufferSize The actual size of the buffer variable. Useful in comparing it to the offset.
  */
-uint32_t getValue(char* buffer, int offset, int bufferSize)
+uint32_t getValue(char* input_buffer, int offset, int bufferSize)
 {
-    int i=0; 
-    uint32_t result=0; /*!< This value will be returned as the wished output. */
-    int flag = 0; /*!< Used to see if we actually read any numbers to signal the program to stop if we reach a char after that. */
-    if(offset<bufferSize) /* if offset is bigger it makes no sense to continue */
+    int                   i=0; 
+    uint32_t       result = 0; 
+    int found_number_flag = 0; 
+
+    if(offset<bufferSize)
     {
-        /*
-         * we start from the offset index
-         * and go to bufferSize-1
-         */
+
         for(i=offset;i<bufferSize; ++i)
         {
-            /* we could be in the situation in which the input is a number smaller than the
-             * bufferSize
-             * so we also need to test if the current character is '\0'
-             * otherwise the result would be faulty
-             * in the sense that there would be trash values added to it
-             */
-            if( buffer[i] == '\0' )
+
+            if ('\0' == input_buffer[i])
             {
                 break;
             }
             else
             {
-                /* this 'if' tests whether the character we reached in the buffer traversal
-                 * is a digit, using the ascii values for 0-9 digits
-                 * we multiply by 10 to add another decimal to the number
-                 * which works fine with 0 ( initial value ) too
-                 * then we sum the result with the decimal we are currently at. 
-                 * the conversion from char to int is done using -'0'
+                /* 
+                 * interval represents ascii coding for 0-9 digits.
+                 * flag is used to stop parsing after we found a number.
                  */
-                if(buffer[i]>=48 && buffer[i]<=57)
+                if (input_buffer[i]>=48 && input_buffer[i]<=57)
                 {
-                    flag = 1;
-                    result=result*10+(buffer[i]-'0');
+                    found_number_flag = 1;
+                    result=result*10+(input_buffer[i]-'0');
                 }
                 /* if it is NOT a digit */
                 else
                 {
                     /* but we have parsed digits in the past */
-                    if(flag == 1)
+                    if (1 == found_number_flag)
                     {
-                        /* that means our job is actually over 
-                         * -> we created in the 'result' variable a number which
-                         * is in our buffer
-                         * after the given offset.
-                         */
                         break;
                     }
+
                 }
+                
             }
+
         }
+        
     }
     else
     {
-        fprintf(stderr,"Offset bigger than number size.\n");
-        exit(EXIT_FAILURE);
+        result = -1;
     }
+
     return result;
 }
 
 int main(void)
 {
-    int result = 0;
-    int bufferSize = 0;
-    int offset = 0;
-    char* buff = 0;
+    int             result = 0;
+    int         bufferSize = 0;
+    int             offset = 0;
+    char*  input_buffer = NULL;
+    int    allocation_flag = 1;
+    int correct_input_flag = 1;
 
     printf("What is the size of the buffer? ");
-    scanf("%d",&bufferSize);
-   
-    // allocating memory for the buffer
-    buff = (char*)malloc(bufferSize); // size of char is 1 so no point in multiplying the buffer size with that.
-    if( buff == 0 ) // should be verified so nothing bad happens when allocation fails.
+    
+    if (0 == scanf("%d",&bufferSize))
     {
-        fprintf(stderr,"Error when allocating memory for the buffer.\n");
-        exit(EXIT_FAILURE); // if allocation fails the program is closed and error is prompted on screen.
+        correct_input_flag = 0;
     }
-    
-    getchar(); // we use this in order to clear the reading buffer.
-    
-    printf("Give the number to be put in the buffer: ");
-    fgets(buff,bufferSize,stdin);
+    else
+    {
+        input_buffer = (char*)malloc(bufferSize); 
 
-    /* if what we read is smaller than the bufferSize we gave,
-     * fgets will also read the \n(enter)
-     * so it needs to be removed explicitly.
-     */
-    if(buff[strlen(buff)-1] == '\n')
-    {
-        buff[strlen(buff)-1] = '\0';
+        if (NULL == input_buffer) 
+        {
+            fprintf(stderr,"Error when allocating memory for the buffer.\n");
+            allocation_flag = 0;
+        }
+
+        getchar(); 
+        
+        if (1 == allocation_flag)
+        {
+            printf("Give the string to be put in the buffer: ");
+
+            if (fgets(input_buffer,bufferSize,stdin) == NULL)
+            {
+                correct_input_flag = 0;
+            }
+
+            if ('\n' == input_buffer[strlen(input_buffer)-1])
+            {
+                input_buffer[strlen(input_buffer)-1] = '\0';
+            }
+        }
+        
+        printf("Give the offset you want to have: ");
+        
+        if (0 == scanf("%d",&offset))
+        {
+            correct_input_flag = 0;
+        }
+
     }
-       
-    printf("Give the offset you want to have: ");
-    scanf("%d",&offset);
     
-    result = getValue(buff,offset,bufferSize);
-    printf("The result is: %d\n",result);
+    if (1 == allocation_flag)
+    {
+        if(1==correct_input_flag)
+        {
+            result = getValue(input_buffer,offset,bufferSize);
+
+            if (-1 != result)
+            {
+                    printf("Result: %d\n",result);
+            }
+            else
+            {
+                fprintf(stderr,"Offset was bigger than the buffer size.\n");
+            }
+            
+        }
+
+        free(input_buffer);
+        input_buffer = NULL;
+    }
+
     return 0;
 }
