@@ -34,6 +34,7 @@ int main(void)
         char      input_buffer[1024] = {0}; 
         char                *endptr = NULL;
         int         was_read_correctly = 1; 
+        errno =                          0; 
 
 	printf("Give the value for which to print the bits: ");
 
@@ -44,35 +45,42 @@ int main(void)
          * If bigger numbers are entered the actual value seems to reset ( go back to 0 and upwards.)
          */
 
-        if (!fgets(input_buffer, 1024, stdin)) /* fgets returns NULL if the input was not read correctly. */
+        if (NULL == fgets(input_buffer, 1024, stdin)) 
         {
-                fprintf(stderr,"Reading input failed.\n");
                 was_read_correctly = 0;
+        }
+        else
+        {       if ('-' == input_buffer[0])
+                {
+                        fprintf(stderr,"Negative number not allowed.\n");
+                        was_read_correctly = 0;
+                }
         }
 
-        if ('-' == input_buffer[0] && 1 == was_read_correctly)
+        if (1 == was_read_correctly)
         {
-                fprintf(stderr,"Negative number not allowed.\n");
-                was_read_correctly = 0;
-        }
+                input_value = strtol(input_buffer, &endptr, 10);
 
-        errno = 0; /* reset error number */
-        input_value = strtol(input_buffer, &endptr, 10);
+                if (ERANGE == errno) 
+                {
+                        fprintf(stderr,"Sorry, this number is too small or too large.\n");
+                        was_read_correctly = 0;
+                }
+                else if (endptr == input_buffer)
+                {
+                        fprintf(stderr,"Incorrect input.\n(Entered characters or characters and digits.)\n");
+                        was_read_correctly = 0;
+                }
+                else if (*endptr && '\n' != *endptr)
+                {
+                        fprintf(stderr,"Input didn't get wholely converted.\n(Entered digits and characters)\n");
+                        was_read_correctly = 0;
+                }
 
-        if (ERANGE == errno && 1 == was_read_correctly) 
-        {
-                fprintf(stderr,"Sorry, this number is too small or too large.\n");
-                was_read_correctly = 0;
         }
-        else if (endptr == input_buffer && 1 == was_read_correctly)
+        else
         {
-                fprintf(stderr,"Incorrect input.\n(Entered characters or characters and digits.)\n");
-                was_read_correctly = 0;
-        }
-        else if (*endptr && '\n' != *endptr && 1 == was_read_correctly)
-        {
-                fprintf(stderr,"Input didn't get wholely converted.\n(Entered digits and characters)\n");
-                was_read_correctly = 0;
+                fprintf(stderr,"Input was not read correctly.\n");
         }
 
         if (1 == was_read_correctly)
