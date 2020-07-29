@@ -6,11 +6,11 @@
  this is how to create a library and also a link for it
  gcc -c -Wall -Werror -fpic p7.c 
  gcc -shared -o libsample.so foo.o
- gcc -L"/home/uic/bootcamp/p7" -Wall -o test main.c -lsample
+ gcc -L"/home/uic84214/bootcamp/p7" -Wall -o exv1 main.c -lsample
  export LD_LIBRARY_PATH=/home/uic/bootcamp/p7:$LD_LIBRARY_PATH
 
 */
-extern int* allocInLib();
-extern void freeInLib( int* );
+extern int* alloc_in_lib();
+extern void free_in_lib( int* );
 
 #endif
