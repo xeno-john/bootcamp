@@ -77,14 +77,14 @@ int main(void)
     int         bufferSize = 0;
     int             offset = 0;
     char*  input_buffer = NULL;
-    int    allocation_flag = 1;
-    int correct_input_flag = 1;
+    int  continuation_flag = 1;
 
     printf("What is the size of the buffer? ");
     
     if (0 == scanf("%d",&bufferSize))
     {
-        correct_input_flag = 0;
+        fprintf(stderr,"Failed to read bufferSize.");
+        continuation_flag = 0;
     }
     else
     {
@@ -93,50 +93,52 @@ int main(void)
         if (NULL == input_buffer) 
         {
             fprintf(stderr,"Error when allocating memory for the buffer.\n");
-            allocation_flag = 0;
+            continuation_flag = 0;
         }
-
-        getchar(); 
-        
-        if (1 == allocation_flag)
+        else
         {
+            getchar(); 
+
             printf("Give the string to be put in the buffer: ");
 
-            if (fgets(input_buffer,bufferSize,stdin) == NULL)
+            if (NULL == fgets(input_buffer,bufferSize,stdin))
             {
-                correct_input_flag = 0;
-            }
-
-            if ('\n' == input_buffer[strlen(input_buffer)-1])
-            {
-                input_buffer[strlen(input_buffer)-1] = '\0';
-            }
-        }
-        
-        printf("Give the offset you want to have: ");
-        
-        if (0 == scanf("%d",&offset))
-        {
-            correct_input_flag = 0;
-        }
-
-    }
-    
-    if (1 == allocation_flag)
-    {
-        if(1==correct_input_flag)
-        {
-            result = getValue(input_buffer,offset,bufferSize);
-
-            if (-1 != result)
-            {
-                    printf("Result: %d\n",result);
+                fprintf(stderr,"Failed to read in the buffer.\n");
+                continuation_flag = 0;
             }
             else
             {
-                fprintf(stderr,"Offset was bigger than the buffer size.\n");
-            }
-            
+
+                if('\n' == input_buffer[strlen(input_buffer)-1])
+                {
+                    input_buffer[strlen(input_buffer)-1] = '\0';
+                }
+
+                printf("Give the offset you want to have: ");
+        
+                if (0 == scanf("%d",&offset))
+                {
+                    fprintf(stderr,"Failed to read offset.");
+                    continuation_flag = 0;
+                }
+
+            } 
+
+        }
+    
+    }
+
+    if (1 == continuation_flag)
+    {
+        result = getValue(input_buffer,offset,bufferSize);
+
+        if (-1 != result)
+        {
+            printf("Result: %d\n",result);
+        }
+        else
+        {
+            fprintf(stderr,"Offset was bigger than the buffer size.\n");
         }
 
         free(input_buffer);

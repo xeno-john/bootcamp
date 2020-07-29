@@ -7,9 +7,9 @@
  * @brief Function that receives an uint32_t and prints the bit configuration of that number.
  * @param [in] input_value - the value gave by the user for which we will print the bits 
  */
-void printBits(uint32_t input_value);
+void print_bits(uint32_t input_value);
 
-void printBits(uint32_t input_value)
+void print_bits(uint32_t input_value)
 {
 	int i = 0;
         int nr_of_bits = sizeof(input_value)*8-1;
@@ -34,7 +34,6 @@ int main(void)
         char      input_buffer[1024] = {0}; 
         char                *endptr = NULL;
         int         was_read_correctly = 1; 
-        errno =                          0; 
 
 	printf("Give the value for which to print the bits: ");
 
@@ -56,6 +55,8 @@ int main(void)
                         was_read_correctly = 0;
                 }
         }
+
+        errno = 0; 
 
         if (1 == was_read_correctly)
         {
@@ -85,7 +86,7 @@ int main(void)
 
         if (1 == was_read_correctly)
         {
-	        printBits(input_value);
+	        print_bits(input_value);
         }
 
 	return 0;
