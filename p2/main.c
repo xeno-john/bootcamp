@@ -8,18 +8,11 @@
  * @brief The function that handles the given task.
  * @param [in] input_buffer - the value gave by the user for which we will print the bits
  * @param [in] offset - index from where the function will parse
- * @param [in] bufferSize - max dimension of input_buffer 
+ * @param [in] bufferSize - max dimension of input_buffer
+ * @param [out] result - is the output returned after succesfully parsing the string 
  */
 uint32_t getValue(char* input_buffer, int offset, int bufferSize);
 
-
-/*!
- *  \fn uint32_t getValue(char* input_buffer, int offset, int bufferSize)
- *  \brief The function that handles the given task.
- *  \param input_buffer The variable from which we are to read and produce the asked output.
- *  \param offset A number that indicates the position from which to start doing the task.
- *  \param bufferSize The actual size of the buffer variable. Useful in comparing it to the offset.
- */
 uint32_t getValue(char* input_buffer, int offset, int bufferSize)
 {
     int                   i=0; 
@@ -42,6 +35,7 @@ uint32_t getValue(char* input_buffer, int offset, int bufferSize)
                  * interval represents ascii coding for 0-9 digits.
                  * flag is used to stop parsing after we found a number.
                  */
+                
                 if (input_buffer[i]>=48 && input_buffer[i]<=57)
                 {
                     found_number_flag = 1;
@@ -51,6 +45,7 @@ uint32_t getValue(char* input_buffer, int offset, int bufferSize)
                 else
                 {
                     /* but we have parsed digits in the past */
+
                     if (1 == found_number_flag)
                     {
                         break;
