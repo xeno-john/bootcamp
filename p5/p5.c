@@ -1,116 +1,146 @@
 #include "p5.h"
 #include<stdlib.h>
 
-int main(int argc, char* argv[])
+int main(void)
 {
     size_t *result = (size_t*)malloc(sizeof(size_t));
-    size_t bufferSize = 0;
-    int serializationSize = 0;
-    COMPONENT_DATA *cInfo=0, *cInfoDeserialized = 0;
-    void* buffer = 0;
+    size_t                           buffer_size = 0;
+    int                       serialization_size = 0;
+    COMPONENT_DATA                    *c_info = NULL; 
+    COMPONENT_DATA       *c_info_deserialized = NULL;
+    void*                serialization_buffer = NULL;
+    int                        continuation_flag = 1;
 
-    // allocating memory for the struct that is going to be
-    // serialized and the one that is going to be deserialized
-    cInfo = (COMPONENT_DATA*)malloc(sizeof(COMPONENT_DATA));
-    cInfoDeserialized = (COMPONENT_DATA*)malloc(sizeof(COMPONENT_DATA));
-    // classic verification if everything went ok
-    if(cInfo == 0)
-    {
-        fprintf(stderr,"Error when allocating memory for the struct.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Please give the buffer size.\n");
-    scanf("%zu",&bufferSize);
+    c_info = (COMPONENT_DATA*)malloc(sizeof(COMPONENT_DATA));
+    c_info_deserialized = (COMPONENT_DATA*)malloc(sizeof(COMPONENT_DATA));
     
-    //allocating memory for the void buffer (where we are
-    //going to copy the data from the struct)
-    buffer = (void*)malloc(bufferSize);
-    if(buffer == 0)
+    if (NULL == c_info || NULL == c_info_deserialized)
     {
-        fprintf(stderr,"Error when allocating buffer.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Give the value of 'attributes' : ");
-    scanf("%d",&cInfo->attributes);
-
-    printf("What is the name size?");
-    scanf("%zu",&cInfo->nameSize);
-
-    //allocating memory for the string in the struct(s).
-    cInfo->name = (char*)malloc(cInfo->nameSize);
-    cInfoDeserialized->name = (char*)malloc(cInfo->nameSize);
-    if(cInfo->name == 0)
-    {
-        fprintf(stderr,"Error when allocating memory for the name in the struct.\n");
-        exit(EXIT_FAILURE);
-    }
-    //getchar() to clear the stdin buffer.
-    getchar();
-    //reading the name in the struct from stdin
-    printf("Please input the name: ");
-    fgets(cInfo->name,cInfo->nameSize,stdin);
-
-    //we get rid of the potential \n read at the end of the string
-    if(cInfo->name[strlen(cInfo->name)-1]=='\n')
-    {
-        cInfo->name[strlen(cInfo->name)-1]='\0';
-    }
-
-    //here we call the function that serializes the data.
-    //it will return the size in bytes of the serialized data
-    //result will say if everything went ok
-    //we will have our values stocked in the 'buffer' value
-    serializationSize = serializeData(cInfo,buffer,bufferSize,result);
-    //IF everything went OK
-    //AND the data we serialized is SMALLER in sizethan the buffer
-    if(*result==0 && serializationSize < bufferSize)
-    {
-        //we move further do deserializing the data
-        serializationSize = deserializeData(buffer,bufferSize,cInfoDeserialized,result);
+        fprintf(stderr,"Error when allocating memory for the struct(s).\n");
+        continuation_flag = 0;
     }
     else
     {
-        //otherwise we indicate where the error came from.
-        DBG_PRINT(1,"Error when serializing. Result: %zu\n",*result);
-        if(serializationSize >= bufferSize)
+        printf("Please give the buffer size.\n");
+        
+        if (0 == scanf("%zu",&buffer_size))
         {
-            //and if it was related to the size of the serialized data.
-            DBG_PRINT(1,"Serialized data has %d bytes which can't fit in the buffer (given buffer size is %zu).\n",serializationSize,bufferSize);
+            fprintf(stderr,"Failed to read buffer size.\n");
+            continuation_flag = 0;
         }
-        //terminate execution, no point in going further
-        exit(EXIT_FAILURE);
-    }
-    //if we get the ok flag from the deserialization function
-    if(*result==0)
-    {
-        //a macro to clear the terminal before outputing
-        clearScreen();
-        //we print the that we've deserialized.
-        DBG_PRINT(5,"\nDeserialized data:\nSerialization size: %d \nAttributes:%d\nName:%s\nnameSize:%zu\n",serializationSize,cInfoDeserialized->attributes,cInfoDeserialized->name,cInfoDeserialized->nameSize);
-    }
-    else
-    {
-        //otherwise, we indicate where the error is coming from
-        DBG_PRINT(1,"Error when deserializing. Result: %zu\n",*result);
-        //and terminate the execution
-        exit(EXIT_FAILURE);
+        else
+        {
+            serialization_buffer = (void*)malloc(buffer_size);
+
+            if (NULL == serialization_buffer)
+            {
+                fprintf(stderr,"Error when allocating buffer.\n");
+                continuation_flag = 0;
+            }
+
+        }
+        
     }
 
-    //freeing the memory we occupied
-    free(result);
-    free(buffer);
-    free(cInfo->name);
-    free(cInfoDeserialized->name);
-    free(cInfo);
-    free(cInfoDeserialized);
-    result=0;
-    buffer=0;
-    cInfo->name=0;
-    cInfoDeserialized->name=0;
-    cInfo=0;
-    cInfoDeserialized=0;
+    if (1 == continuation_flag)
+    {
+        printf("Give the value of 'attributes' : ");
+        
+        if (0 == scanf("%d",&c_info->attributes))
+        {
+            fprintf(stderr,"Error when reading 'attributes'.\n");
+            continuation_flag = 0;
+        }
+        else
+        {
+            printf("What is the name size?");
+            
+            if (0 == scanf("%zu",&c_info->nameSize))
+            {
+                fprintf(stderr,"Error when reading name size.\n");
+                continuation_flag = 0;
+            }
+            else
+            {
+                c_info->name = (char*)malloc(c_info->nameSize);
+                c_info_deserialized->name = (char*)malloc(c_info->nameSize);
+                
+                if( NULL == c_info->name || NULL == c_info_deserialized->name)
+                {
+                    fprintf(stderr,"Error when allocating memory to the 'name' field of struct.\n");
+                    continuation_flag =0;
+                }
+                else
+                {
+                    getchar();
+
+                    printf("Please input the name: ");
+                    
+                    if (NULL == fgets(c_info->name,c_info->nameSize,stdin))
+                    {
+                        fprintf(stderr,"Failed to read 'name'\n");
+                        continuation_flag = 0;
+                    }
+                    else
+                    {
+                        
+                        if ('\n' == c_info->name[strlen(c_info->name)-1])
+                        {
+                            c_info->name[strlen(c_info->name)-1]='\0';
+                        }
+
+                    }
+                    
+                }
+                
+            }
+            
+        }
+
+    }
+
+    if (1 == continuation_flag)
+    {
+        serialization_size = serialize_data(c_info,serialization_buffer,buffer_size,result);
+
+        if (0 == *result && serialization_size < buffer_size)
+        {
+            serialization_size = deserialize_data(serialization_buffer,buffer_size,c_info_deserialized,result);
+        }
+        else
+        {
+
+            DBG_PRINT(1,"Error when serializing. Result: %zu\n",*result);
+            if (serialization_size >= buffer_size)
+            {
+                DBG_PRINT(1,"Serialized data has %d bytes which can't fit in the buffer (given buffer size is %zu).\n",serialization_size,buffer_size);
+            }
+        }
+
+        if (0 == *result)
+        {
+            /* a macro to clear the terminal before outputing */
+            clearScreen();
+            DBG_PRINT(5,"\nDeserialized data:\nSerialization size: %d \nAttributes:%d\nName:%s\nnameSize:%zu\n",serialization_size,c_info_deserialized->attributes,c_info_deserialized->name,c_info_deserialized->nameSize);
+        }
+        else
+        {
+            DBG_PRINT(1,"Error when deserializing. Result: %zu\n",*result);
+        }
+
+        free(result);
+        free(serialization_buffer);
+        free(c_info->name);
+        free(c_info_deserialized->name);
+        free(c_info);
+        free(c_info_deserialized);
+        result=0;
+        serialization_buffer=0;
+        c_info->name=NULL;
+        c_info_deserialized->name=NULL;
+        c_info=NULL;
+        c_info_deserialized=NULL;
+    }
       
     return 0;
 }
