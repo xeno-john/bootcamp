@@ -2,6 +2,7 @@
 #define Q_H_
 
 #include "../DBG_PRINT.h"
+#include <stdbool.h>
 
 typedef struct _NODE
 {
@@ -15,9 +16,9 @@ typedef struct _QUEUE
     NODE *end;
 } QUEUE;
 
-void push(int, QUEUE *q);
+bool push(int value, QUEUE *queue);
 void pop(QUEUE *q);
 void traverse(QUEUE *q);
-int isEmpty(QUEUE* q);
+int is_empty(QUEUE* q);
 
 #endif

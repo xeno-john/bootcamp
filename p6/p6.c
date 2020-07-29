@@ -3,77 +3,96 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void push(int value, QUEUE *q)
+/**
+ *  @brief Function that introduces data in the queue
+ *  @param [in] value - value which will be introduced in the queue
+ *  @param [in] queue - pointer to the queue in which the data is going to be introduced
+ */
+bool push(int value, QUEUE *queue)
 {
     NODE *aux = (NODE*)malloc(sizeof(NODE));
-    aux->data = value;
-    aux->next = NULL;
-
-    if(isEmpty(q) == 1)
+    bool return_value = true;
+    
+    if (NULL != aux)
     {
-        //if the queue is empty
-        // we initialize the pointer in the starting position
-        q->start = aux;
-        // the rear pointer will be the same as the front one
-        // because we only have one element
-        q->end = aux;
+        aux->data = value;
+        aux->next = NULL;
+
+        if (1 == is_empty(queue))
+        {
+            queue->start = aux;
+            queue->end = aux;
+        }
+        else
+        {
+            queue->end->next = aux;
+            queue->end = aux;
+        }
+
     }
     else
     {
-        // otherwise, we create the connection in the rear of the
-        q->end->next = aux;
-        q->end = aux;
+        fprintf(stderr,"Failed to allocate auxiliary value in push function.\n");
+        return_value = false;
     }
-
+    
+    return return_value;
 }
 
-void pop(QUEUE *q)
+/**
+ *  @brief Function that removes data from the queue.
+ *  @param [in] queue - pointer to the queue in which the data is going to be removed
+ */
+void pop(QUEUE *queue)
 {
-    // if the queue has no elements
-    // we terminate the program.
-    if(isEmpty(q) == 1)
+
+    if (1 == is_empty(queue))
     {
-        fprintf(stderr,"Q is empty.\n");
+        fprintf(stderr,"queue is empty.\n");
         exit(EXIT_FAILURE);
     }
     else
     {
-        // otherwise 
-        // we use a temp value to actually print the value we pop
-        NODE *temp = q->start;
-        q->start = temp->next; // here we modify the starting position
-        // because one element is eliminated
+        NODE *temp = queue->start;
+        queue->start = temp->next; 
         DBG_PRINT(5,"Popped out %d\n",temp->data);
-        free(temp); // free memory
+        free(temp);
         temp=0;
     }
 
 }
 
-void traverse(QUEUE *q)
+/**
+ *  @brief Function that traverses the queue and prints all the current data.
+ *  @param [in] queue - pointer to the queue which is going to be printed.
+ */
+void traverse(QUEUE *queue)
 {
     printf("The queue:\n");
-    // if we got any elements left
-    if(isEmpty(q) == 0)
+
+    if (0 == is_empty(queue))
     {
-        // we use a temporary value initialized with the starting point
-        NODE *temp = q->start;
-        // until we reach the null value ( end of the queue)
-        while(temp != NULL)
+        NODE *temp = queue->start;
+        
+        while (NULL != temp)
         {
-            DBG_PRINT(1,"%d\n",temp->data); // we print the element
-            temp = temp->next; // then we move to the next one in the Q
+            DBG_PRINT(1,"%d\n",temp->data); 
+            temp = temp->next; 
         }
+
         free(temp);
+        temp = NULL;
     }
+    
 }
 
-int isEmpty(QUEUE *q)
+/**
+ *  @brief Function that retruns 1 (true) if the given queue is empty, and 0 otherwise
+ *  @param [in] queue - pointer to the queue which is going to be tested for emptiness
+ */
+int is_empty(QUEUE *queue)
 {
-    // we use the ternary operator to return
-    // 1 if the queue is empty
-    // 0 if it is not
-    return ((q->start == NULL) ? 1 : 0);
+    return ((NULL == queue->start) ? 1 : 0);
 }
 
 

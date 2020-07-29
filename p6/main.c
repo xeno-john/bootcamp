@@ -2,21 +2,39 @@
 #include<stdlib.h>
 #include<time.h>
 
-#define DIM 15
+#define MAX_QUEUE_DIMENSION 15
 
 int main(void)
 {
-    int i = 0;
-    QUEUE *q = (QUEUE*)malloc(sizeof(QUEUE));
-    //add random elements into the queue.
-    srand(time(NULL));
-    for(i=0; i<DIM; ++i)
+    QUEUE *queue = (QUEUE*)malloc(sizeof(QUEUE));
+    int                                    i = 0;
+
+    if(NULL != queue)
     {
-        push(rand()%100+1,q);
+        srand(time(NULL));
+
+        for (i=0; i<MAX_QUEUE_DIMENSION; ++i)
+        {
+
+            if (true != push(rand()%100+1,queue))
+            {
+                fprintf(stderr,"Something went wrong when adding a queue member.\n");
+                break;
+            }
+
+        }
+
+        traverse(queue); 
+
+        free(queue);
+        queue=NULL;
     }
-    traverse(q); // print the elements
-    free(q); // free memory .
-    q=0;
+    else
+    {
+        fprintf(stderr,"Failed to allocate memory for the pointer that indicates the start of the queue.\n");
+    }
+    
+
     return 0;
 }
 
