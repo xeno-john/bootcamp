@@ -3,7 +3,7 @@
 #include<time.h>
 
 #define DIM 15
-
+/* dummy comment please remove */
 int main(void)
 {
     int i = 0;
