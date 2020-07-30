@@ -1,6 +1,6 @@
 #include "p9.h"
 #include <stdlib.h>
-
+/* delete this dummy line */
 int main(void)
 {
     pthread_t threads[NUM_THREADS];
