@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+/* remove this line  */
 /**
  *  @brief Function that introduces data in the queue
  *  @param [in] value - value which will be introduced in the queue
