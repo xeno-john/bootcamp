@@ -24,7 +24,7 @@ int main(void)
 
         }
 
-        traverse(queue); 
+        traverse(queue);
 
         free(queue);
         queue=NULL;

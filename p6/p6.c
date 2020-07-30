@@ -7,6 +7,7 @@
  *  @brief Function that introduces data in the queue
  *  @param [in] value - value which will be introduced in the queue
  *  @param [in] queue - pointer to the queue in which the data is going to be introduced
+ *  @return return_value - boolean true if push was succesfull, false otherwise
  */
 bool push(int value, QUEUE *queue)
 {
@@ -89,10 +90,18 @@ void traverse(QUEUE *queue)
 /**
  *  @brief Function that retruns 1 (true) if the given queue is empty, and 0 otherwise
  *  @param [in] queue - pointer to the queue which is going to be tested for emptiness
+ *  @return empty_flag - is 1 if given queue has no elements, 0 otherwise
  */
 int is_empty(QUEUE *queue)
 {
-    return ((NULL == queue->start) ? 1 : 0);
+    int empty_flag = 0;
+
+    if (NULL == queue->start)
+    {
+        empty_flag = 1;
+    }
+
+    return empty_flag;
 }
 
 
