@@ -8,7 +8,7 @@
  * https://docs.oracle.com/cd/E88353_01/html/E37843/dlsym-3c.html
  * https://stackoverflow.com/questions/1354537/dlsym-dlopen-with-runtime-arguments
  */
-
+/*remove dummy line*/
 int main(void)
 {
     void *handle = dlopen("/home/uic84214/bootcamp/p7/libsample.so", RTLD_LOCAL | RTLD_LAZY);
