@@ -5,7 +5,7 @@ int conditionMet = 0;
 pthread_cond_t      cond  = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
 
-
+/* please remove */
 int main(void)
 {
     // here we declare an array of (p)threads
