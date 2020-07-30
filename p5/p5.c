@@ -1,6 +1,6 @@
 #include "p5.h"
 #include<stdlib.h>
-
+/* dummy: remove comment when modifying */
 int main(void)
 {
     size_t *result = (size_t*)malloc(sizeof(size_t));
