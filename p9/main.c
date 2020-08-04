@@ -1,5 +1,25 @@
-#include "p9.h"
 #include <stdlib.h>
+#include "../DBG_PRINT.h"
+#include <stdio.h>
+#include <pthread.h>
+
+#define NUM_THREADS 10
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+/**
+ *  @brief Function receives a void* and prints the int at that location.
+ *  @param arg [in] the address at which the index that's going to be printed is 
+ */
+void *task(void *arg);
+
+void *task(void *arg)
+{
+    pthread_mutex_lock(&mutex);
+    DBG_PRINT(5,"Argument: %d\n",(*(int*)arg)++); 
+    pthread_mutex_unlock(&mutex);
+    pthread_exit(NULL);
+}
 
 int main(void)
 {
@@ -7,23 +27,23 @@ int main(void)
     int                      i = 0; 
     int              *value = NULL;
 
-    value = (int*)malloc(sizeof(int)); // allocating memory for the pointer
+    value = (int*)malloc(sizeof(int)); 
     
     if (NULL == value)
     {
         fprintf(stderr,"Error when allocating memory.\n");
-        exit(EXIT_FAILURE); // if not, terminate the exectuion
     }
     else
     {
 
         for(i = 0; i < NUM_THREADS; ++i)
         {
+
             if(pthread_create(&threads[i], NULL, task, (void*)value))
             {
                 DBG_PRINT(1,"Error: can't create thread. %d\n",pthread_create(&threads[i], NULL, task, (void*)value));
-                exit(EXIT_FAILURE);
             }
+
         }
 
         for(i = 0; i < NUM_THREADS; ++i)
