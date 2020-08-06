@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#define NUM_THREADS 10
+#define NUM_THREADS 100
 
 void *task(void *arg);
 

@@ -7,12 +7,11 @@ int main(void)
     int                      i = 0; 
     int              *value = NULL;
 
-    value = (int*)malloc(sizeof(int)); // allocating memory for the pointer
+    value = (int*)malloc(sizeof(int)); 
     
     if (NULL == value)
     {
         fprintf(stderr,"Error when allocating memory.\n");
-        exit(EXIT_FAILURE); // if not, terminate the exectuion
     }
     else
     {
@@ -22,14 +21,14 @@ int main(void)
             if(pthread_create(&threads[i], NULL, task, (void*)value))
             {
                 DBG_PRINT(1,"Error: can't create thread. %d\n",pthread_create(&threads[i], NULL, task, (void*)value));
-                exit(EXIT_FAILURE);
+                break;
             }
         }
 
-        for(i = 0; i < NUM_THREADS; ++i)
-        {
-            pthread_join(threads[i],NULL);
-        }
+        // for(i = 0; i < NUM_THREADS; ++i)
+        // {
+        //     pthread_join(threads[i],NULL);
+        // }
 
         free(value);
         value = NULL;

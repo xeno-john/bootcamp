@@ -3,7 +3,7 @@
 
 int main(void)
 {
-    size_t *result = (size_t*)malloc(sizeof(size_t));
+    size_t result                                = 0;
     size_t                           buffer_size = 0;
     int                       serialization_size = 0;
     COMPONENT_DATA                    *c_info = NULL; 
@@ -101,23 +101,23 @@ int main(void)
 
     if (1 == continuation_flag)
     {
-        serialization_size = serialize_data(c_info,serialization_buffer,buffer_size,result);
+        serialization_size = serialize_data(c_info,serialization_buffer,buffer_size,&result);
 
-        if (0 == *result && serialization_size < buffer_size)
+        if (0 == result && serialization_size < buffer_size)
         {
-            serialization_size = deserialize_data(serialization_buffer,buffer_size,c_info_deserialized,result);
+            serialization_size = deserialize_data(serialization_buffer,buffer_size,c_info_deserialized,&result);
         }
         else
         {
 
-            DBG_PRINT(1,"Error when serializing. Result: %zu\n",*result);
+            DBG_PRINT(1,"Error when serializing. Result: %zu\n",result);
             if (serialization_size >= buffer_size)
             {
                 DBG_PRINT(1,"Serialized data has %d bytes which can't fit in the buffer (given buffer size is %zu).\n",serialization_size,buffer_size);
             }
         }
 
-        if (0 == *result)
+        if ((0 == result) && (serialization_size < buffer_size))
         {
             /* a macro to clear the terminal before outputing */
             clearScreen();
@@ -125,17 +125,15 @@ int main(void)
         }
         else
         {
-            DBG_PRINT(1,"Error when deserializing. Result: %zu\n",*result);
+            DBG_PRINT(1,"Error when deserializing. Result: %zu\n",result);
         }
 
-        free(result);
         free(serialization_buffer);
         free(c_info->name);
         free(c_info_deserialized->name);
         free(c_info);
         free(c_info_deserialized);
-        result=0;
-        serialization_buffer=0;
+        serialization_buffer=NULL;
         c_info->name=NULL;
         c_info_deserialized->name=NULL;
         c_info=NULL;
