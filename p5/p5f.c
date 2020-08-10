@@ -56,4 +56,3 @@ int deserialize_data(void *serialization_buffer, size_t buffer_size, COMPONENT_D
 
     return deserialized_size;
 }
-
