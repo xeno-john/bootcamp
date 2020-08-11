@@ -1,5 +1,4 @@
 #include "p11.h"
-#include <errno.h>
 
 int main(void)
 {
@@ -13,39 +12,49 @@ int main(void)
 
     start_engine(e_data);
 
-    for (i = 0; i < NUMBER_OF_PRODUCERS; i++)
+    if (NULL == e_data)
     {
-        pthread_error = pthread_create(&producer_threads[i], NULL, (void*)produce, (void*)e_data);
-        if (0 != pthread_error)
-        {
-            DBG_PRINT(1, "Error! Code for pthread_create: %d", pthread_error);
-            continuation_flag = 0;
-            break;
-        }
+        continuation_flag = 0;
     }
 
-    errno = 0;
-    for (i = 0; i < NUMBER_OF_PRODUCERS; i++)
+    if (1 == continuation_flag)
     {
-        
-        if (1 == continuation_flag)
+
+        for (i = 0; i < NUMBER_OF_PRODUCERS; i++)
         {
-            printf("\naici:%d\n",i);
-            pthread_error = pthread_join(producer_threads[i], NULL);
-            printf("\naici:%d\n",i);
+            pthread_error = pthread_create(&producer_threads[i], NULL, (void*)produce, (void*)e_data);
+            
             if (0 != pthread_error)
             {
-                DBG_PRINT(1, "Error! Code for pthread_join: %d", pthread_error);
+                DBG_PRINT(1, "Error! Code for pthread_create: %d", pthread_error);
+                continuation_flag = 0;
+                break;
             }
+
         }
+        
+        for (i = 0; i < NUMBER_OF_PRODUCERS; i++)
+        {
+            
+            if (1 == continuation_flag)
+            {
+                pthread_error = pthread_join(producer_threads[i], NULL);
+
+                if (0 != pthread_error)
+                {
+                    DBG_PRINT(1, "Error! Code for pthread_join: %d", pthread_error);
+                }
+                
+            }
+
+        }
+
+        e_data->is_ready = true;
+
+        pthread_mutex_destroy(&e_data->mutex);
+        stop_engine((void*)e_data);
+        destroy_engine((void*)e_data);
     }
-
-    pthread_cond_destroy(&e_data->cond);
-    pthread_mutex_destroy(&e_data->mutex);
-
-    stop_engine((void*)e_data);
-
-    destroy_engine((void*)e_data);
 
     return 0;    
 }

@@ -8,7 +8,6 @@ typedef struct _ENGINE_DATA
     QUEUE* q;
     pthread_t* consumer_thread;
     pthread_mutex_t mutex;
-    pthread_cond_t cond;
     bool is_ready;
 }ENGINE_DATA;
 
