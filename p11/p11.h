@@ -10,10 +10,9 @@ typedef struct _ENGINE_DATA
     pthread_mutex_t mutex;
     pthread_cond_t cond;
     bool is_ready;
-    int nr_of_elements;
 }ENGINE_DATA;
 
-#define NUMBER_OF_PRODUCERS 5
+#define NUMBER_OF_PRODUCERS 10
 
 void* initialize_engine(void);
 int start_engine(void* engine);

@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-pthread_mutex_t queue_mutex  = PTHREAD_MUTEX_INITIALIZER;
-
 /**
  *  @brief Function that introduces data in the queue
  *  @param [in] value - value which will be introduced in the queue
@@ -14,6 +12,7 @@ pthread_mutex_t queue_mutex  = PTHREAD_MUTEX_INITIALIZER;
  */
 void push(int value, QUEUE *queue)
 {
+
     NODE *aux = (NODE*)malloc(sizeof(NODE));
 
     if (NULL != aux)
@@ -37,6 +36,7 @@ void push(int value, QUEUE *queue)
     {
         fprintf(stderr,"Failed to allocate auxiliary value in push function.\n");
     }
+
 
 }
 

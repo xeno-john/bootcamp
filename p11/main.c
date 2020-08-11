@@ -1,4 +1,5 @@
 #include "p11.h"
+#include <errno.h>
 
 int main(void)
 {
@@ -23,15 +24,15 @@ int main(void)
         }
     }
 
-    sleep(1);
-    e_data->is_ready = false;
-
-    
+    errno = 0;
     for (i = 0; i < NUMBER_OF_PRODUCERS; i++)
     {
+        
         if (1 == continuation_flag)
         {
+            printf("\naici:%d\n",i);
             pthread_error = pthread_join(producer_threads[i], NULL);
+            printf("\naici:%d\n",i);
             if (0 != pthread_error)
             {
                 DBG_PRINT(1, "Error! Code for pthread_join: %d", pthread_error);
@@ -39,7 +40,8 @@ int main(void)
         }
     }
 
-    sleep(5);
+    pthread_cond_destroy(&e_data->cond);
+    pthread_mutex_destroy(&e_data->mutex);
 
     stop_engine((void*)e_data);
 

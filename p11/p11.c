@@ -13,7 +13,6 @@ void* initialize_engine(void)
     ENGINE_DATA *engine_data = (ENGINE_DATA*)malloc(sizeof(ENGINE_DATA));
 
     engine_data->is_ready = false;
-    engine_data->nr_of_elements = 0;
 
     engine_data->q = (QUEUE*)malloc(sizeof(QUEUE));
     if (NULL == engine_data->q)
@@ -50,6 +49,13 @@ int start_engine(void* engine)
     return 0;
 }
 
+/**
+ * @fn int produce(void* engine, int index)
+ * @brief A function that is called by a producer thread and pushes an element on the engine queue.
+ * @param[in] engine ENGINE_DATA* struct. 
+ * @param[in] index Index.
+ * @return int 
+ **/
 int produce(void* engine, int index)
 {
 
@@ -61,9 +67,7 @@ int produce(void* engine, int index)
 
     push(rand_value, ((ENGINE_DATA*)engine)->q);
 
-    ((ENGINE_DATA*)engine)->nr_of_elements ++;
-
-    traverse(((ENGINE_DATA*)engine)->q);
+    // traverse(((ENGINE_DATA*)engine)->q);
 
     while (false != ((ENGINE_DATA*)engine)->is_ready)
     {
@@ -72,7 +76,7 @@ int produce(void* engine, int index)
 
     ((ENGINE_DATA*)engine)->is_ready = true;
 
-    pthread_cond_signal (&((ENGINE_DATA*)engine)->cond);
+    pthread_cond_broadcast (&((ENGINE_DATA*)engine)->cond);
 
     pthread_mutex_unlock(&((ENGINE_DATA*)engine)->mutex);
 
@@ -100,19 +104,30 @@ int on_consume(void *engine, int index)
         pthread_cond_wait (&((ENGINE_DATA*)engine)->cond, &((ENGINE_DATA*)engine)->mutex);
     }
 
+    printf("pop: ");
 
-    if (0 == is_empty(((ENGINE_DATA*)engine)->q))
+    while (0 == is_empty(((ENGINE_DATA*)engine)->q))
     {
         pop(((ENGINE_DATA*)engine)->q);
     }
 
-    pthread_cond_signal (&((ENGINE_DATA*)engine)->cond);
+    ((ENGINE_DATA*)engine)->is_ready = false;
+
+    pthread_cond_broadcast (&((ENGINE_DATA*)engine)->cond);
 
     pthread_mutex_unlock(&((ENGINE_DATA*)engine)->mutex);
+
+    pthread_exit(NULL);
 
     return 0;
 }
 
+/**
+ * @fn stop_engine(void* engine)
+ * @brief Stops the consumer thread.
+ * @param[in] engine ENGINE_DATA* struct.
+ * @return void 
+ **/
 void stop_engine(void* engine)
 {
     int pthread_error = pthread_join(*((ENGINE_DATA*)engine)->consumer_thread, NULL);
@@ -124,24 +139,18 @@ void stop_engine(void* engine)
 }
 
 /**
- * \fn void destroyEngine(void* engine)
- * \brief Deallocates ENGINE_DATA* members created with initializeEngine and struct.
- * \param[in] engine ENGINE_DATA* struct.
- * \return void 
+ * @fn void destroy_engine(void* engine)
+ * @brief Deallocates ENGINE_DATA* members created with initialize_engine.
+ * @param[in] engine ENGINE_DATA* struct.
+ * @return void 
  **/
 void destroy_engine(void* engine)
 {
-
+    
     if (NULL != ((ENGINE_DATA*)engine)->q)
     {
         free(((ENGINE_DATA*)engine)->q);
         ((ENGINE_DATA*)engine)->q = NULL;
-    }
-
-    if (NULL != engine)
-    {
-        free(engine);
-        engine = NULL;
     }
 
 }
