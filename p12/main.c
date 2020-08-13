@@ -51,6 +51,8 @@ int main(void)
 
         }
 
+        bubble_sort(list_head);
+
         printf("Result:\n");
         traverse(list_head);
 

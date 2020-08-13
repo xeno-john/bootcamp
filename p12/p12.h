@@ -21,5 +21,8 @@ typedef struct _NODE
 NODE* insert_in_list(NODE* head, char to_be_inserted[]);
 NODE* init_list_node();
 void traverse(NODE* head);
+void bubble_sort(NODE *start);
+void swap(NODE *left_node, NODE *right_node);
+
 
 #endif

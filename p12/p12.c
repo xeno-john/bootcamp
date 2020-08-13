@@ -103,3 +103,49 @@ NODE* init_list_node()
     /* returns null and is verified in caller function if it fails to allocate */
     return node_to_be_inserted;
 }
+
+void bubble_sort(NODE *start) 
+{ 
+    int          swapped = 0;
+    NODE        *ptr1 = NULL; 
+    NODE        *lptr = NULL; 
+  
+    if (start == NULL)
+    {
+        fprintf(stderr,"Empty list. Nothing to be sorted.\n");
+    }
+    else
+    {
+        do
+        { 
+            swapped = 0; 
+            ptr1 = start; 
+    
+            while (ptr1->next != lptr) 
+            { 
+                if (ptr1->content.nr_of_occurences < ptr1->next->content.nr_of_occurences) 
+                {  
+                    swap(ptr1, ptr1->next); 
+                    swapped = 1; 
+                } 
+                ptr1 = ptr1->next; 
+            } 
+
+            lptr = ptr1; 
+        } 
+        while (0 != swapped); 
+    }
+
+} 
+
+void swap(NODE *left_node, NODE *right_node) 
+{ 
+    int temp = left_node->content.nr_of_occurences; 
+    char temp_char[256];
+    strcpy(temp_char,left_node->content.word);
+
+    left_node->content.nr_of_occurences = right_node->content.nr_of_occurences; 
+    strcpy(left_node->content.word,right_node->content.word);
+    right_node->content.nr_of_occurences = temp; 
+    strcpy(right_node->content.word,temp_char);
+} 
