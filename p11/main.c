@@ -4,25 +4,40 @@ int main(void)
 {
     ENGINE_DATA                           *e_data = NULL;
     int                                            i = 0;
-    pthread_t producer_threads[NUMBER_OF_PRODUCERS] = {};
+    pthread_t      producer_threads[NUMBER_OF_PRODUCERS];
     int                                pthread_error = 0;
     int                            continuation_flag = 1;
+    ARGS                               *arguments = NULL;
 
     e_data = (ENGINE_DATA*)initialize_engine();
-
-    start_engine(e_data);
 
     if (NULL == e_data)
     {
         continuation_flag = 0;
     }
+    else
+    {
+        arguments = (ARGS*)malloc(sizeof(ARGS));
+
+        if (NULL == arguments)
+        {
+            continuation_flag = 0;
+        }
+        else
+        {
+            arguments->engine = e_data;
+        }
+
+    }
+    
 
     if (1 == continuation_flag)
     {
+        start_engine(arguments);
 
         for (i = 0; i < NUMBER_OF_PRODUCERS; i++)
         {
-            pthread_error = pthread_create(&producer_threads[i], NULL, (void*)produce, (void*)e_data);
+            pthread_error = pthread_create(&producer_threads[i], NULL, produce, arguments);
             
             if (0 != pthread_error)
             {
@@ -51,9 +66,16 @@ int main(void)
 
         e_data->is_ready = true;
 
-        pthread_mutex_destroy(&e_data->mutex);
+        sleep(1); /* otherwise we might free the memory before the consumer is done */
+        
         stop_engine((void*)e_data);
         destroy_engine((void*)e_data);
+
+        free(e_data);
+        e_data = NULL;
+
+        free(arguments);
+        arguments = NULL;
     }
 
     return 0;    

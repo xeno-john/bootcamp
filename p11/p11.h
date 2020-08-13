@@ -9,13 +9,21 @@ typedef struct _ENGINE_DATA
     pthread_t* consumer_thread;
     pthread_mutex_t mutex;
     bool is_ready;
+    bool consumer_online;
 }ENGINE_DATA;
+
+typedef struct _ARGS
+{
+    ENGINE_DATA* engine;
+    unsigned long index;
+
+}ARGS;
 
 #define NUMBER_OF_PRODUCERS 10
 
-void* initialize_engine(void);
-int start_engine(void* engine);
-int produce(void* engine, int index);
-int on_consume(void *engine, int index);
+void *initialize_engine(void);
+void start_engine(void* engine);
+void *produce(void* arguments);
+void *on_consume(void *arguments);
 void stop_engine(void* engine);
 void destroy_engine(void* engine);

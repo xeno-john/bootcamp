@@ -56,8 +56,8 @@ void pop(QUEUE *queue)
         NODE *temp = queue->start;
         queue->start = temp->next; 
         DBG_PRINT(5,"Popped out %d\n",temp->data);
-        // free(temp);
-        // temp=0;
+        free(temp);
+        temp=0;
     }
 
 }
@@ -79,7 +79,7 @@ void traverse(QUEUE *queue)
             DBG_PRINT(1,"%d\n",temp->data); 
             temp = temp->next; 
         }
-
+        
         free(temp);
         temp = NULL;
     }
