@@ -1,0 +1,2 @@
+am refacut acest text sa poata fi parsat
+intr-o singura linie cu strtok strtok strtok strtok
