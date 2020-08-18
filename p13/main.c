@@ -19,7 +19,7 @@ int main(void)
         printf("\n1.Open file.");
         printf("\n2.Write text at position.");
         printf("\n3.Delete text from position");
-        printf("\n5.Undo last operation.");
+        printf("\n4.Undo last operation.");
         printf("\n5.Redo last undone operation.");
         printf("\n0.Exit.\n>");
 
