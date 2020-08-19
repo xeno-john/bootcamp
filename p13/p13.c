@@ -77,14 +77,12 @@ void write_text_at_position(char text[], int position, FILE* file, char* file_na
             fseek(file,position+strlen(text),SEEK_SET);
             fprintf(file,"%s",file_content_buffer);
             rewind(file);
-            printf("\nbravo\n");
         }
         else
         {
             fseek(file,0,SEEK_END);
             fprintf(file,"%s",text);
             rewind(file);
-            printf("\nsau nu\n");
         }
         
     }
