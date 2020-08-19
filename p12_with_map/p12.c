@@ -1,5 +1,12 @@
 #include "p12.h"
 
+
+/**
+ * @fn MAP *initialize_map(unsigned int map_size)
+ * @brief creates a MAP* and retuns it
+ * @param map_size - the wished size of the returned MAP*
+ * @return - MAP* pointer to the freshly allocated MAP
+ */
 MAP *initialize_map(unsigned int map_size)
 {
     MAP* created_map = (MAP*)malloc(map_size*sizeof(MAP));
@@ -13,6 +20,13 @@ MAP *initialize_map(unsigned int map_size)
     return created_map;
 }
 
+/**
+ * @fn unsigned int insert(MAP *map, char key[])
+ * @brief inserts an element into the map
+ * @param map - pointer to the map used in implementation
+ * @param key[] - the text wished to be introduced in the map
+ * @return unsigned int curr_size - the size of the map
+ */
 unsigned int insert(MAP *map, char key[])
 {
     unsigned int                i = 0;
@@ -40,6 +54,13 @@ unsigned int insert(MAP *map, char key[])
     return curr_size;
 }
 
+
+/** void sort(MAP *map, unsigned int size)
+ * @brief sorts the elements of the map based on their number of occurences
+ * @param map - the map wished to be sorted
+ * @param size - the actual size of the map
+ * @return void
+ */
 void sort(MAP *map, unsigned int size)
 {
     int swapped = 0;
@@ -74,6 +95,13 @@ void sort(MAP *map, unsigned int size)
     
 }
 
+/**
+ * @fn void print(MAP *map, unsigned int size)
+ * @brief prints the content of the map in an organised manner
+ * @param map - the map of which content follows to be printed
+ * @param size - the actual size of the map
+ * @return void
+ */
 void print(MAP *map, unsigned int size)
 {
     unsigned int i = 0;
