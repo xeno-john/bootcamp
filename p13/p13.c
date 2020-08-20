@@ -59,33 +59,46 @@ void write_text_at_position(char text[], int position, FILE* file, char* file_na
 {
     char* file_content_buffer = (char*)malloc(MAX_TEXT_SIZE);
 
-    file = freopen(file_name,"r+",file);
-
-    if (NULL == file_content_buffer)
+    if( NULL != file)
     {
-        fprintf(stderr,"Failed to allocate memory for the file_content_buffer.\n");
+        file = freopen(file_name,"r+",file);
     }
-    else
+
+    if (NULL != file)
     {
-        fseek(file,position,SEEK_SET);
-        
-        if (EOF != fgetc(file))
+
+        if (NULL == file_content_buffer)
         {
-            fgets(file_content_buffer,MAX_TEXT_SIZE,file);
-            fseek(file,position,SEEK_SET);
-            fprintf(file,"%s",text);
-            fseek(file,position+strlen(text),SEEK_SET);
-            fprintf(file,"%s",file_content_buffer);
-            rewind(file);
+            fprintf(stderr,"Failed to allocate memory for the file_content_buffer.\n");
         }
         else
         {
-            fseek(file,0,SEEK_END);
-            fprintf(file,"%s",text);
-            rewind(file);
+            fseek(file,position,SEEK_SET);
+            
+            if (EOF != fgetc(file))
+            {
+                fseek(file,position,SEEK_SET); /* fix to faulty insertion - fgetc was modifying where the file cursor was */
+                fgets(file_content_buffer,MAX_TEXT_SIZE,file);
+                fseek(file,position ,SEEK_SET);
+                fprintf(file,"%s",text);
+                fseek(file,position+strlen(text),SEEK_SET);
+                fprintf(file,"%s",file_content_buffer);
+                rewind(file);
+            }
+            else
+            {
+                fseek(file,0,SEEK_END);
+                fprintf(file,"%s",text);
+                rewind(file);
+            }
+            
         }
-        
     }
+    else
+    {
+        fprintf(stderr,"Failed to reopen file in write_text_at_positiona at line %d.\n",__LINE__);
+    }
+    
 
     free(file_content_buffer);
     file_content_buffer = NULL;
@@ -107,33 +120,50 @@ void delete_text_from_position(int position, int nr_of_deleted_characters, FILE 
 
     file = freopen(file_name,"r+",file);
 
-    if (NULL == file_content_buffer)
-    {
-        fprintf(stderr,"Failed to allocate memory for the file_content_buffer.\n");
-    }
-    else
+    if( NULL != file)
     {
 
-        fgets(file_content_buffer,MAX_TEXT_SIZE,file);
-    
-        if (strlen(file_content_buffer)>nr_of_deleted_characters + position)
+        if (NULL == file_content_buffer)
         {
-            strcpy(file_content_buffer + position, file_content_buffer + position + nr_of_deleted_characters);
+            fprintf(stderr,"Failed to allocate memory for the file_content_buffer.\n");
         }
         else
         {
-            file_content_buffer[position]='\0';
+
+            fgets(file_content_buffer,MAX_TEXT_SIZE,file);
+        
+            if (strlen(file_content_buffer)>nr_of_deleted_characters + position)
+            {
+                strcpy(file_content_buffer + position , file_content_buffer + position + nr_of_deleted_characters);
+            }
+            else
+            {
+                file_content_buffer[position]='\0';
+            }
+
+            file = freopen(file_name,"w",file);
+
+            if (NULL != file)
+            {
+                fprintf(file,"%s",file_content_buffer);
+                rewind(file);
+            }
+            else
+            {
+                fprintf(stderr,"Failed to reopen file in write mode in delete_text_from_position at line %d.",__LINE__);
+            }
+            
+
+            free(file_content_buffer);
+            file_content_buffer = NULL;
         }
 
-        file = freopen(file_name,"w",file);
-
-        fprintf(file,"%s",file_content_buffer);
-        rewind(file);
-
-        free(file_content_buffer);
-        file_content_buffer = NULL;
     }
-
+    else
+    {
+        fprintf(stderr,"Failed to reopen file in delete_text_from_position.\n");
+    }
+    
 }
 
 
@@ -149,6 +179,14 @@ void undo_last_operation(char what_was_before[], FILE* file, char *file_name)
 {
     file = freopen(file_name,"w",file);
 
-    fprintf(file,"%s",what_was_before);
-    rewind(file);
+    if (NULL != file)
+    {
+        fprintf(file,"%s",what_was_before);
+        rewind(file);
+    }
+    else
+    {
+        fprintf(stderr,"Failed to reopen file in write mode in undo_last_operation at line %d",__LINE__);
+    }
+    
 }
