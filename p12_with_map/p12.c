@@ -5,16 +5,19 @@
  * @fn MAP *initialize_map(unsigned int map_size)
  * @brief creates a MAP* and retuns it
  * @param map_size - the wished size of the returned MAP*
- * @return - MAP* pointer to the freshly allocated MAP
+ * @return allocated MAP* pointer in case of success, NULL in case of failure
  */
 MAP *initialize_map(unsigned int map_size)
 {
     MAP* created_map = (MAP*)malloc(map_size*sizeof(MAP));
     unsigned int                                      i=0;
 
-    for (i=0; i<map_size; ++i)
+    if (NULL != created_map)
     {
-        (created_map+i)->nr_of_occurences=0;
+        for (i=0; i<map_size; ++i)
+        {
+            (created_map+i)->nr_of_occurences=0;
+        }
     }
 
     return created_map;
@@ -33,13 +36,13 @@ unsigned int insert(MAP *map, char key[])
     unsigned int       found_flag = 0;
     static unsigned int curr_size = 0;
     
-    for(i=0; i<curr_size; ++i)
+    for(i=0; i<curr_size; ++i && 0 == found_flag)
     {
+
         if (0 == strncmp((map+i)->key,key,strlen((map+i)->key)))
         {
-            found_flag = 1;
             (map+i)->nr_of_occurences++;
-            break;
+            found_flag = 1;
         }
         
     }
@@ -64,6 +67,8 @@ unsigned int insert(MAP *map, char key[])
 void sort(MAP *map, unsigned int size)
 {
     int swapped = 0;
+    unsigned int aux_nr_of_occurences = 0;
+    char aux_key[MAX_NR_OF_CHARACTERS]={};
 
     do
     { 
@@ -75,9 +80,7 @@ void sort(MAP *map, unsigned int size)
 
             if ((map+i)->nr_of_occurences<(map+i+1)->nr_of_occurences) 
             {
-                unsigned int aux_nr_of_occurences = (map+i)->nr_of_occurences;
-                char aux_key[256];
-
+                aux_nr_of_occurences = (map+i)->nr_of_occurences;
                 (map+i)->nr_of_occurences=(map+i+1)->nr_of_occurences;
                 (map+i+1)->nr_of_occurences=aux_nr_of_occurences;
 

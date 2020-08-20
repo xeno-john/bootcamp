@@ -60,12 +60,20 @@ int main(void)
 
         free(map);
         map = NULL;
+
+        free(parser);
+        parser = NULL;
     }
     else
     {
         fprintf(stderr,"Failed to allocate memory for the map.\n");
     }
     
+    if (NULL != input_file)
+    {
+        fclose(input_file);
+        input_file = NULL;
+    }
 
     return 0;
 }

@@ -10,6 +10,7 @@
 #define MAX_MAP_DIMENSION 16384
 #define MAX_NR_OF_CHARACTERS 4096
 
+
 typedef struct _MAP
 {
     int nr_of_occurences;
