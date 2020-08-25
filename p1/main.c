@@ -1,39 +1,12 @@
-#include <stdio.h>
-#include <stdint.h> 
-#include <stdlib.h>
-#include <errno.h>
-
-/**
- * @brief Function that receives an uint32_t and prints the bit configuration of that number.
- * @param [in] input_value - the value gave by the user for which we will print the bits 
- */
-void print_bits(uint32_t input_value);
-
-void print_bits(uint32_t input_value)
-{
-	int i = 0;
-        int nr_of_bits = sizeof(input_value)*8-1;
-
-        printf("\nThis is the number you gave written in binary representation:\n");
-
-	for(i=nr_of_bits;i>=0;--i)
-	{
-	        printf("%u", ( (1 << i) & input_value ) ? 1 : 0 );
-                if( i%4 == 0 )
-                {
-                        printf("\t");
-                }
-	}
-
-        printf("\n");
-}
+#include "p1.h"
 
 int main(void)
 {
 	uint32_t           input_value = 0; 
         char      input_buffer[1024] = {0}; 
         char                *endptr = NULL;
-        int         was_read_correctly = 1; 
+        int         was_read_correctly = 1;
+        char *number_representation = NULL;
 
 	printf("Give the value for which to print the bits: ");
 
@@ -86,7 +59,20 @@ int main(void)
 
         if (1 == was_read_correctly)
         {
-	        print_bits(input_value);
+                number_representation = print_bits(input_value);
+
+                if (NULL != number_representation)
+                {
+                        printf("\nThis is the number you gave written in binary representation:\n");
+                        printf("%s\n",number_representation);
+                        free(number_representation);
+                        number_representation = NULL;
+                }
+                else
+                {
+                        fprintf(stderr,"Failed to allocate correctly number_representation.\n");
+                }
+                
         }
 
 	return 0;
